@@ -1,0 +1,12 @@
+{
+  "name": "Medra — Личен здравен архив",
+  "short_name": "Medra",
+  "description": "Личен архив на медицински изследвания с AI анализ",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#0d1f0d",
+  "background_color": "#0d1f0d",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
