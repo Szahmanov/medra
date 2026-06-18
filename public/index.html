@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0d1f0d">
+<title>Medra — Личен здравен архив</title>
+<link rel="manifest" href="/manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g1:#0d1f0d;--g2:#162916;--accent:#4a8c60;--accent-light:#6ab882;--accent-glow:rgba(74,140,96,0.15);
+  --paper:#f8f7f2;--ink3:#7a7a70;--border:rgba(74,140,96,0.18);--border2:rgba(74,140,96,0.35);
+  --surface:rgba(255,255,255,0.04);--red:#c0392b;--amber:#b85c00;--blue:#2471a3;
+}
+html,body{min-height:100%;font-family:'DM Sans',sans-serif;background:var(--g1);color:var(--paper);overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.35}
+.orb{position:fixed;border-radius:50%;filter:blur(100px);pointer-events:none;z-index:0}
+.orb1{width:600px;height:600px;background:radial-gradient(circle,rgba(74,140,96,.12),transparent 70%);top:-150px;right:-150px}
+.orb2{width:400px;height:400px;background:radial-gradient(circle,rgba(74,140,96,.08),transparent 70%);bottom:-100px;left:-100px}
+
+header{position:sticky;top:0;z-index:100;background:rgba(13,31,13,.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 20px}
+.hdr-logo{display:flex;align-items:center;gap:10px}
+.hdr-icon{width:32px;height:32px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0}
+.hdr-cross-h{position:absolute;width:15px;height:5px;background:#fff;border-radius:2px}
+.hdr-cross-v{position:absolute;width:5px;height:15px;background:#fff;border-radius:2px}
+.hdr-name{font-family:'DM Serif Display',serif;font-size:21px;letter-spacing:-.5px}
+.hdr-name em{color:var(--accent-light);font-style:italic}
+.notif-btn{background:transparent;border:1px solid var(--border2);color:var(--accent-light);padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;display:flex;align-items:center;gap:6px}
+.notif-btn:hover{background:rgba(74,140,96,.1)}
+.notif-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+main{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:32px 18px 100px}
+
+.hero{text-align:center;margin-bottom:28px}
+.hero h1{font-family:'DM Serif Display',serif;font-size:clamp(24px,5vw,32px);line-height:1.2;margin-bottom:8px}
+.hero h1 em{color:var(--accent-light);font-style:italic}
+.hero p{font-size:14px;color:rgba(248,247,242,.5);line-height:1.6;font-weight:300;max-width:440px;margin:0 auto}
+
+.upload-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:26px;margin-bottom:28px;backdrop-filter:blur(10px)}
+.dropzone{border:1.5px dashed rgba(74,140,96,.35);border-radius:14px;padding:40px 20px;text-align:center;cursor:pointer;transition:all .2s;position:relative;margin-bottom:14px}
+.dropzone:hover,.dropzone.over{border-color:var(--accent);background:rgba(74,140,96,.06)}
+.dropzone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.dz-icon{font-size:36px;margin-bottom:10px;display:block}
+.dz-title{font-size:15px;font-weight:500;margin-bottom:4px}
+.dz-sub{font-size:12px;color:rgba(248,247,242,.35);font-weight:300}
+.file-pill{display:none;align-items:center;gap:10px;padding:12px 14px;background:rgba(74,140,96,.1);border:1px solid rgba(74,140,96,.25);border-radius:10px;margin-bottom:14px}
+.file-pill.show{display:flex}
+.file-pill-name{flex:1;font-family:'DM Mono',monospace;font-size:12px;color:var(--accent-light);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.remove-btn{background:none;border:none;cursor:pointer;color:rgba(248,247,242,.35);font-size:18px;line-height:1}
+.upload-btn{width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.upload-btn:hover:not(:disabled){background:var(--accent-light)}
+.upload-btn:disabled{opacity:.4;cursor:not-allowed}
+.progress{height:2px;background:rgba(255,255,255,.08);border-radius:2px;margin-top:14px;overflow:hidden;display:none}
+.progress.show{display:block}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-light));border-radius:2px;width:0;transition:width .5s ease}
+
+.result-panel{display:none;border:1px solid var(--border);border-radius:20px;margin-bottom:28px;overflow:hidden}
+.result-panel.show{display:block}
+.rp-head{padding:20px 24px;display:flex;align-items:center;gap:14px}
+.rp-head.ALL_NORMAL{background:rgba(74,140,96,.12);border-bottom:1px solid rgba(74,140,96,.2)}
+.rp-head.ATTENTION_NEEDED{background:rgba(184,92,0,.1);border-bottom:1px solid rgba(184,92,0,.2)}
+.rp-head.CONSULT_URGENTLY{background:rgba(192,57,43,.1);border-bottom:1px solid rgba(192,57,43,.2)}
+.rp-icon{font-size:24px}.rp-label{font-size:15px;font-weight:500}.rp-date{font-size:12px;color:rgba(248,247,242,.4);margin-top:2px}
+.rp-body{padding:24px;background:var(--surface)}
+.summary-box{font-size:14px;line-height:1.75;color:rgba(248,247,242,.7);margin-bottom:20px;padding:16px;background:rgba(255,255,255,.04);border-radius:10px;border-left:2px solid var(--accent);font-weight:300}
+.spec-box{padding:12px 16px;background:rgba(184,92,0,.1);border:1px solid rgba(184,92,0,.2);border-radius:10px;font-size:13px;color:#e8a060;margin-bottom:20px}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{text-align:left;padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.08);font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:rgba(248,247,242,.3);font-weight:500}
+.tbl td{padding:10px;border-bottom:1px solid rgba(255,255,255,.05);vertical-align:top;color:rgba(248,247,242,.7)}
+.tbl tr:last-child td{border-bottom:none}
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500;font-family:'DM Mono',monospace}
+.badge-NORMAL{background:rgba(74,140,96,.2);color:#6ab882}
+.badge-HIGH{background:rgba(192,57,43,.15);color:#e07060}
+.badge-LOW{background:rgba(36,113,163,.15);color:#60a0d0}
+.tnote{font-size:11px;color:rgba(248,247,242,.35);margin-top:3px;font-weight:300}
+
+.hist-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.sec-title{font-family:'DM Serif Display',serif;font-size:20px}
+.hist-count{font-family:'DM Mono',monospace;font-size:11px;color:rgba(248,247,242,.3)}
+.hist-empty{text-align:center;padding:48px 20px;background:var(--surface);border:1px solid var(--border);border-radius:20px;color:rgba(248,247,242,.3);font-size:14px;font-weight:300}
+.hist-item{background:var(--surface);border:1px solid var(--border);border-radius:16px;margin-bottom:10px;overflow:hidden;transition:border-color .2s}
+.hist-item:hover{border-color:var(--border2)}
+.hist-row{padding:16px 18px;cursor:pointer;display:flex;align-items:center;gap:12px;user-select:none}
+.hist-date{font-family:'DM Mono',monospace;font-size:11px;color:rgba(248,247,242,.3);white-space:nowrap}
+.hist-text{flex:1;font-size:13px;color:rgba(248,247,242,.6);line-height:1.4;font-weight:300}
+.hist-status{font-size:16px}
+.chevron{color:rgba(248,247,242,.2);font-size:14px;transition:transform .2s}
+.hist-item.open .chevron{transform:rotate(90deg)}
+.hist-body{display:none;padding:0 18px 18px;border-top:1px solid rgba(255,255,255,.05)}
+.hist-item.open .hist-body{display:block}
+.hist-thumb{max-width:100%;border-radius:10px;margin:14px 0;border:1px solid var(--border)}
+
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(120px);background:rgba(30,58,30,.95);color:var(--paper);padding:12px 22px;border-radius:12px;font-size:13px;transition:transform .3s cubic-bezier(.34,1.56,.64,1);z-index:999;max-width:90vw;text-align:center;border:1px solid var(--border2);backdrop-filter:blur(20px)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.err{background:rgba(192,57,43,.9)}
+.spin{display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+.privacy-note{text-align:center;font-size:12px;color:rgba(248,247,242,.3);margin-top:24px;font-weight:300;line-height:1.6}
+.privacy-note strong{color:var(--accent-light)}
+</style>
+</head>
+<body>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<header>
+  <div class="hdr-logo">
+    <div class="hdr-icon"><div class="hdr-cross-h"></div><div class="hdr-cross-v"></div></div>
+    <span class="hdr-name">Me<em>dra</em></span>
+  </div>
+  <button class="notif-btn" id="notifBtn" onclick="enableNotifications()">🔔 Напомняния</button>
+</header>
+
+<main>
+  <div class="hero">
+    <h1>Вашият личен <em>здравен архив</em></h1>
+    <p>Качете изследванията си. AI ги анализира моментално. Данните остават само на вашето устройство.</p>
+  </div>
+
+  <div class="upload-card">
+    <div class="dropzone" id="dz">
+      <input type="file" id="fileInput" accept="image/jpeg,image/jpg,image/png,image/webp" onchange="pickFile(this.files[0])">
+      <span class="dz-icon">📷</span>
+      <div class="dz-title">Качете снимка на изследванията</div>
+      <div class="dz-sub">JPG, PNG, WebP · Натиснете или провлачете</div>
+    </div>
+    <div class="file-pill" id="filePill">
+      <span>📄</span>
+      <span class="file-pill-name" id="fileName"></span>
+      <button class="remove-btn" onclick="clearFile()">✕</button>
+    </div>
+    <button class="upload-btn" id="uploadBtn" disabled onclick="doAnalyze()">
+      <span id="uploadLabel">Анализирай изследванията →</span>
+    </button>
+    <div class="progress" id="prog"><div class="progress-fill" id="progFill"></div></div>
+  </div>
+
+  <div class="result-panel" id="resultPanel">
+    <div class="rp-head" id="rpHead">
+      <span class="rp-icon" id="rpIcon"></span>
+      <div><div class="rp-label" id="rpLabel"></div><div class="rp-date" id="rpDate"></div></div>
+    </div>
+    <div class="rp-body">
+      <div class="summary-box" id="rpSummary"></div>
+      <div class="spec-box" id="rpSpec" style="display:none"></div>
+      <table class="tbl"><thead><tr><th>Показател</th><th>Стойност</th><th>Референция</th><th>Статус</th></tr></thead>
+      <tbody id="rpTests"></tbody></table>
+    </div>
+  </div>
+
+  <div class="hist-hdr">
+    <div class="sec-title">Архив</div>
+    <span class="hist-count" id="histCount"></span>
+  </div>
+  <div id="histList"><div class="hist-empty">Зареждане...</div></div>
+
+  <div class="privacy-note">🔒 Всички данни се пазят <strong>само на вашето устройство</strong>.<br>Никой друг няма достъп до тях — нито ние, нито трети страни.</div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script src="/app.js"></script>
+</body>
+</html>
